@@ -19,7 +19,6 @@ object Random {
 
     fun nextByte(origin: Byte, bound: Byte): Byte = nextInt(origin.toInt(), bound.toInt()).toByte()
     fun nextChar(origin: Char, bound: Char): Char = nextInt(origin.toInt(), bound.toInt()).toChar()
-    fun nextPrintableChar(): Char = nextInt(PRINTABLE_ASCII_ORIGIN, PRINTABLE_ASCII_BOUND).toChar()
 
     fun nextShort(origin: Short, bound: Short): Short = nextInt(origin.toInt(), bound.toInt()).toShort()
     fun nextInt(origin: Int, bound: Int): Int = ints(origin, bound).findAny().asInt
@@ -47,7 +46,7 @@ object Random {
         }
 
         val range = bound - origin
-        val value = BigDecimal(nextGaussian())
+        val value = BigDecimal(nextDouble(0.0, 1.0))
         return value * range + origin
     }
 
