@@ -1,5 +1,6 @@
 package io.kotlincheck
 
+import io.kotlincheck.gen.Gen
 import io.kotlintest.TestCase
 
 

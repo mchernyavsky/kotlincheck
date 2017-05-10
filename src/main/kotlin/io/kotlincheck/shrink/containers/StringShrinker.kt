@@ -5,8 +5,8 @@ import io.kotlincheck.shrink.CharShrinker
 import io.kotlincheck.shrink.Shrinker
 
 class StringShrinker(
-        sizeBound: Int,
-        fixedSize: Boolean
+        val sizeBound: Int,
+        val fixedSize: Boolean
 ) : Shrinker<String> {
     private val charListShrinker = ListShrinker(
             CharShrinker(
