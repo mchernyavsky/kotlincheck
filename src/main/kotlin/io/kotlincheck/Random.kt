@@ -7,11 +7,11 @@ import java.util.stream.DoubleStream
 import java.util.stream.IntStream
 import java.util.stream.LongStream
 
-internal object Random {
-    private val SOURCE: Random = Random()
+object Random {
+    val PRINTABLE_ASCII_ORIGIN = 32
+    val PRINTABLE_ASCII_BOUND = 127
 
-    private val PRINTABLE_ASCII_ORIGIN = 32
-    private val PRINTABLE_ASCII_BOUND = 127
+    private val SOURCE: Random = Random()
 
     private val BAD_RANGE = "bound must be greater than origin"
 

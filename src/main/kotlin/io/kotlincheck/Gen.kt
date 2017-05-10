@@ -1,16 +1,21 @@
 package io.kotlincheck
 
+import io.kotlincheck.shrink.*
+import io.kotlincheck.shrink.containers.*
 import java.math.BigDecimal
 import java.math.BigInteger
 
 
-interface Gen<out T> {
-    fun generate(): T
+abstract class Gen<T>(private val shrinker: Shrinker<T>?) {
+    abstract fun generate(): T
 
     companion object {
         private val DEFAULT_COLLECTION_SIZE_BOUND = 100
 
-        inline fun <T> create(crossinline body: () -> T): Gen<T> = object : Gen<T> {
+        inline fun <reified T> create(
+                shrinker: Shrinker<T>?,
+                crossinline body: () -> T
+        ): Gen<T> = object : Gen<T>(shrinker) {
             override fun generate(): T = body()
         }
 
@@ -65,91 +70,173 @@ interface Gen<out T> {
             else -> throw IllegalArgumentException("cannot infer generator for $className")
         }
 
-        fun booleans(): Gen<Boolean> = create { Random.nextBoolean() }
+        fun booleans(): Gen<Boolean> = create(
+                BooleanShrinker(),
+                { Random.nextBoolean() }
+        )
 
-        fun bytes(origin: Byte = Byte.MIN_VALUE, bound: Byte = Byte.MAX_VALUE): Gen<Byte> =
-                create { Random.nextByte(origin, bound) }
+        fun bytes(
+                origin: Byte = Byte.MIN_VALUE,
+                bound: Byte = Byte.MAX_VALUE
+        ): Gen<Byte> = create(
+                ByteShrinker(origin, bound),
+                { Random.nextByte(origin, bound) }
+        )
 
-        fun chars(origin: Char = Char.MIN_SURROGATE, bound: Char = Char.MAX_SURROGATE): Gen<Char> =
-                create { Random.nextChar(origin, bound) }
+        fun chars(
+                origin: Char = Char.MIN_SURROGATE,
+                bound: Char = Char.MAX_SURROGATE
+        ): Gen<Char> = create(
+                CharShrinker(origin, bound),
+                { Random.nextChar(origin, bound) }
+        )
 
-        fun printableChars(): Gen<Char> = create { Random.nextPrintableChar() }
+        fun printableChars(): Gen<Char> = create(
+                CharShrinker(
+                        Random.PRINTABLE_ASCII_ORIGIN.toChar(),
+                        Random.PRINTABLE_ASCII_BOUND.toChar()
+                ),
+                { Random.nextPrintableChar() }
+        )
 
-        fun strings(lengthBound: Int = DEFAULT_COLLECTION_SIZE_BOUND,
-                    fixedLength: Boolean = false): Gen<String> = object : Gen<String> {
+        fun strings(
+                lengthBound: Int = DEFAULT_COLLECTION_SIZE_BOUND,
+                fixedLength: Boolean = false
+        ): Gen<String> = object : Gen<String>(StringShrinker(lengthBound, fixedLength)) {
             private val charListsGen = lists(printableChars(), lengthBound, fixedLength)
             override fun generate(): String = charListsGen.generate().joinToString("")
         }
 
-        fun shorts(origin: Short = Short.MIN_VALUE, bound: Short = Short.MAX_VALUE): Gen<Short> =
-                create { Random.nextShort(origin, bound) }
+        fun shorts(
+                origin: Short = Short.MIN_VALUE,
+                bound: Short = Short.MAX_VALUE
+        ): Gen<Short> = create(
+                ShortShrinker(origin, bound),
+                { Random.nextShort(origin, bound) }
+        )
 
-        fun ints(origin: Int = Int.MIN_VALUE, bound: Int = Int.MAX_VALUE): Gen<Int> =
-                create { Random.nextInt(origin, bound) }
+        fun ints(
+                origin: Int = Int.MIN_VALUE,
+                bound: Int = Int.MAX_VALUE
+        ): Gen<Int> = create(
+                IntShrinker(origin, bound),
+                { Random.nextInt(origin, bound) }
+        )
 
-        fun longs(origin: Long = Long.MIN_VALUE, bound: Long = Long.MAX_VALUE): Gen<Long> =
-                create { Random.nextLong(origin, bound) }
+        fun longs(
+                origin: Long = Long.MIN_VALUE,
+                bound: Long = Long.MAX_VALUE
+        ): Gen<Long> = create(
+                LongShrinker(origin, bound),
+                { Random.nextLong(origin, bound) }
+        )
 
-        fun bigIntegers(origin: BigInteger, bound: BigInteger): Gen<BigInteger> =
-                create { Random.nextBigInteger(origin, bound) }
+        fun bigIntegers(
+                origin: BigInteger,
+                bound: BigInteger
+        ): Gen<BigInteger> = create(
+                BigIntegerShrinker(origin, bound),
+                { Random.nextBigInteger(origin, bound) }
+        )
 
-        fun floats(origin: Float = Float.MIN_VALUE, bound: Float = Float.MAX_VALUE): Gen<Float> =
-                create { Random.nextFloat(origin, bound) }
+        fun floats(
+                origin: Float = Float.MIN_VALUE,
+                bound: Float = Float.MAX_VALUE
+        ): Gen<Float> = create(
+                FloatShrinker(origin, bound),
+                { Random.nextFloat(origin, bound) }
+        )
 
-        fun doubles(origin: Double = Double.MIN_VALUE, bound: Double = Double.MAX_VALUE): Gen<Double> =
-                create { Random.nextDouble(origin, bound) }
+        fun doubles(
+                origin: Double = Double.MIN_VALUE,
+                bound: Double = Double.MAX_VALUE
+        ): Gen<Double> = create(
+                DoubleShrinker(origin, bound),
+                { Random.nextDouble(origin, bound) }
+        )
 
-        fun gaussians(): Gen<Double> = create { Random.nextGaussian() }
+        fun gaussians(): Gen<Double> = create(
+                DoubleShrinker(0.0, 1.0),
+                { Random.nextGaussian() }
+        )
 
-        fun bigDecimals(origin: BigDecimal, bound: BigDecimal): Gen<BigDecimal> =
-                create { Random.nextBigDecimal(origin, bound) }
+        fun bigDecimals(origin: BigDecimal, bound: BigDecimal): Gen<BigDecimal> = create(
+                BigDecimalShrinker(origin, bound),
+                { Random.nextBigDecimal(origin, bound) }
+        )
 
-        fun <T> oneOf(values: List<T>): Gen<T> = create { values[Random.nextInt(0, values.size)] }
+        inline fun <reified T> oneOf(values: List<T>): Gen<T> = create(
+                OneOfShrinker(values),
+                { values[Random.nextInt(0, values.size)] }
+        )
 
-        fun <T> oneOf(values: Array<T>): Gen<T> = create { values[Random.nextInt(0, values.size)] }
+        inline fun <reified T> oneOf(values: Array<T>): Gen<T> = create(
+                OneOfShrinker(values.asList()),
+                { values[Random.nextInt(0, values.size)] }
+        )
 
-        fun <T> oneOf(values: Set<T>): Gen<T> = oneOf(values.toList())
+        inline fun <reified T> oneOf(values: Set<T>): Gen<T> = oneOf(values.toList())
 
-        fun <T> oneOf(vararg generators: Gen<T>): Gen<T> = object : Gen<T> {
+        fun <T> oneOf(vararg generators: Gen<T>): Gen<T> = object : Gen<T>(null) {
             private val oneOfGens = oneOf(generators.toList())
             override fun generate(): T = oneOfGens.generate().generate()
         }
 
-        fun <T> nullable(gen: Gen<T>): Gen<T?> = oneOf(create { null }, gen)
+        inline fun <reified T> nullable(gen: Gen<T?>): Gen<T?> = oneOf(create<T?>(null) { null }, gen)
 
-        fun <A, B> pairs(gen1: Gen<A>, gen2: Gen<B>): Gen<Pair<A, B>> =
-                create { Pair(gen1.generate(), gen2.generate()) }
+        fun <A, B> pairs(
+                gen1: Gen<A>,
+                gen2: Gen<B>): Gen<Pair<A, B>> = create(
+                PairShrinker(gen1.shrinker, gen2.shrinker),
+                { Pair(gen1.generate(), gen2.generate()) }
+        )
 
-        fun <A, B, C> triplets(gen1: Gen<A>, gen2: Gen<B>, gen3: Gen<C>): Gen<Triple<A, B, C>> =
-                create { Triple(gen1.generate(), gen2.generate(), gen3.generate()) }
+        fun <A, B, C> triplets(gen1: Gen<A>, gen2: Gen<B>, gen3: Gen<C>): Gen<Triple<A, B, C>> = create(
+                TripleShrinker(gen1.shrinker, gen2.shrinker, gen3.shrinker),
+                { Triple(gen1.generate(), gen2.generate(), gen3.generate()) }
+        )
 
 
-        /** Collection generators */
+        /** Container generators */
 
-        fun <T> lists(gen: Gen<T>,
-                      sizeBound: Int = DEFAULT_COLLECTION_SIZE_BOUND,
-                      fixedSize: Boolean = false): Gen<List<T>> = create {
-            val size = if (fixedSize) sizeBound else Random.nextInt(0, sizeBound + 1)
-            (0 until size).map { gen.generate() }
-        }
+        fun <T> lists(
+                gen: Gen<T>,
+                sizeBound: Int = DEFAULT_COLLECTION_SIZE_BOUND,
+                fixedSize: Boolean = false
+        ): Gen<List<T>> = create(
+                ListShrinker(gen.shrinker, sizeBound, fixedSize),
+                {
+                    val size = if (fixedSize) sizeBound else Random.nextInt(0, sizeBound + 1)
+                    (0 until size).map { gen.generate() }
+                }
+        )
 
-        fun <T> mutableLists(gen: Gen<T>,
-                             sizeBound: Int = DEFAULT_COLLECTION_SIZE_BOUND,
-                             fixedSize: Boolean = false): Gen<MutableList<T>> = object : Gen<MutableList<T>> {
-            private val listsGen = lists(gen, sizeBound, fixedSize)
-            override fun generate(): MutableList<T> = listsGen.generate().toMutableList()
-        }
+        fun <T> mutableLists(
+                gen: Gen<T>,
+                sizeBound: Int = DEFAULT_COLLECTION_SIZE_BOUND,
+                fixedSize: Boolean = false
+        ): Gen<MutableList<T>> = create(
+                MutableListShrinker(gen.shrinker, sizeBound, fixedSize),
+                {
+                    val size = if (fixedSize) sizeBound else Random.nextInt(0, sizeBound + 1)
+                    (0 until size).map { gen.generate() }.toMutableList()
+                }
+        )
 
-        fun <T> sets(gen: Gen<T>,
-                     sizeBound: Int = DEFAULT_COLLECTION_SIZE_BOUND,
-                     fixedSize: Boolean = false): Gen<Set<T>> = object : Gen<Set<T>> {
+        fun <T> sets(
+                gen: Gen<T>,
+                sizeBound: Int = DEFAULT_COLLECTION_SIZE_BOUND,
+                fixedSize: Boolean = false
+        ): Gen<Set<T>> = object : Gen<Set<T>>(null) {
             private val setsGen = mutableSets(gen, sizeBound, fixedSize)
             override fun generate(): Set<T> = setsGen.generate().toSet()
         }
 
-        fun <T> mutableSets(gen: Gen<T>,
-                            sizeBound: Int = DEFAULT_COLLECTION_SIZE_BOUND,
-                            fixedSize: Boolean = false): Gen<MutableSet<T>> = create {
+        fun <T> mutableSets(
+                gen: Gen<T>,
+                sizeBound: Int = DEFAULT_COLLECTION_SIZE_BOUND,
+                fixedSize: Boolean = false
+        ): Gen<MutableSet<T>> = create(null) {
             val expectedSize = if (fixedSize) sizeBound else Random.nextInt(0, sizeBound)
             val set = mutableSetOf<T>()
             while (set.size < expectedSize) {
@@ -158,16 +245,22 @@ interface Gen<out T> {
             set
         }
 
-        fun <K, V> maps(keyGen: Gen<K>, valueGen: Gen<V>,
-                        sizeBound: Int = DEFAULT_COLLECTION_SIZE_BOUND,
-                        fixedSize: Boolean = false): Gen<Map<K, V>> = object : Gen<Map<K, V>> {
+        fun <K, V> maps(
+                keyGen: Gen<K>,
+                valueGen: Gen<V>,
+                sizeBound: Int = DEFAULT_COLLECTION_SIZE_BOUND,
+                fixedSize: Boolean = false
+        ): Gen<Map<K, V>> = object : Gen<Map<K, V>>(null) {
             private val mapsGen = mutableMaps(keyGen, valueGen, sizeBound, fixedSize)
             override fun generate(): Map<K, V> = mapsGen.generate().toMap()
         }
 
-        fun <K, V> mutableMaps(keyGen: Gen<K>, valueGen: Gen<V>,
-                               sizeBound: Int = DEFAULT_COLLECTION_SIZE_BOUND,
-                               fixedSize: Boolean = false): Gen<MutableMap<K, V>> = create {
+        fun <K, V> mutableMaps(
+                keyGen: Gen<K>,
+                valueGen: Gen<V>,
+                sizeBound: Int = DEFAULT_COLLECTION_SIZE_BOUND,
+                fixedSize: Boolean = false
+        ): Gen<MutableMap<K, V>> = create(null) {
             val expectedSize = if (fixedSize) sizeBound else Random.nextInt(0, sizeBound)
             val map = mutableMapOf<K, V>()
             while (map.size < expectedSize) {
