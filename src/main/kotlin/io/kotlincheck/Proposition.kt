@@ -1,6 +1,6 @@
 package io.kotlincheck
 
-import io.kotlincheck.gen.Gen
+import io.kotlincheck.arbitrary.Arbitrary
 import io.kotlintest.TestCase
 
 
@@ -8,12 +8,12 @@ object Proposition {
     val DEFAULT_TIMES = 300
 
     fun <P> forAll(
-            gen: Gen<P>,
+            arb: Arbitrary<P>,
             times: Int,
             test: (P) -> Boolean
     ): () -> Unit = {
         repeat(times) {
-            val arg = gen.generate()
+            val arg = arb.generate()
             if (!test(arg)) {
                 throw AssertionError("Proposition failed for arg = $arg")
             }
@@ -21,14 +21,14 @@ object Proposition {
     }
 
     fun <P1, P2> forAll(
-            gen1: Gen<P1>,
-            gen2: Gen<P2>,
+            arb1: Arbitrary<P1>,
+            arb2: Arbitrary<P2>,
             times: Int,
             test: (P1, P2) -> Boolean
     ): () -> Unit = {
         repeat(times) {
-            val arg1 = gen1.generate()
-            val arg2 = gen2.generate()
+            val arg1 = arb1.generate()
+            val arg2 = arb2.generate()
             if (!test(arg1, arg2)) {
                 throw AssertionError("Proposition failed for arg1 = $arg1; arg2 = $arg2")
             }
@@ -36,16 +36,16 @@ object Proposition {
     }
 
     fun <P1, P2, P3> forAll(
-            gen1: Gen<P1>,
-            gen2: Gen<P2>,
-            gen3: Gen<P3>,
+            arb1: Arbitrary<P1>,
+            arb2: Arbitrary<P2>,
+            arb3: Arbitrary<P3>,
             times: Int,
             test: (P1, P2, P3) -> Boolean
     ): () -> Unit = {
         repeat(times) {
-            val arg1 = gen1.generate()
-            val arg2 = gen2.generate()
-            val arg3 = gen3.generate()
+            val arg1 = arb1.generate()
+            val arg2 = arb2.generate()
+            val arg3 = arb3.generate()
             if (!test(arg1, arg2, arg3)) {
                 throw AssertionError("Proposition failed for arg1 = $arg1; arg2 = $arg2; arg3 = $arg3")
             }
@@ -53,18 +53,18 @@ object Proposition {
     }
 
     fun <P1, P2, P3, P4> forAll(
-            gen1: Gen<P1>,
-            gen2: Gen<P2>,
-            gen3: Gen<P3>,
-            gen4: Gen<P4>,
+            arb1: Arbitrary<P1>,
+            arb2: Arbitrary<P2>,
+            arb3: Arbitrary<P3>,
+            arb4: Arbitrary<P4>,
             times: Int,
             test: (P1, P2, P3, P4) -> Boolean
     ): () -> Unit = {
         repeat(times) {
-            val arg1 = gen1.generate()
-            val arg2 = gen2.generate()
-            val arg3 = gen3.generate()
-            val arg4 = gen4.generate()
+            val arg1 = arb1.generate()
+            val arg2 = arb2.generate()
+            val arg3 = arb3.generate()
+            val arg4 = arb4.generate()
             if (!test(arg1, arg2, arg3, arg4)) {
                 throw AssertionError("Proposition failed for " +
                                      "arg1 = $arg1; arg2 = $arg2; arg3 = $arg3; " +
@@ -74,20 +74,20 @@ object Proposition {
     }
 
     fun <P1, P2, P3, P4, P5> forAll(
-            gen1: Gen<P1>,
-            gen2: Gen<P2>,
-            gen3: Gen<P3>,
-            gen4: Gen<P4>,
-            gen5: Gen<P5>,
+            arb1: Arbitrary<P1>,
+            arb2: Arbitrary<P2>,
+            arb3: Arbitrary<P3>,
+            arb4: Arbitrary<P4>,
+            arb5: Arbitrary<P5>,
             times: Int,
             test: (P1, P2, P3, P4, P5) -> Boolean
     ): () -> Unit = {
         repeat(times) {
-            val arg1 = gen1.generate()
-            val arg2 = gen2.generate()
-            val arg3 = gen3.generate()
-            val arg4 = gen4.generate()
-            val arg5 = gen5.generate()
+            val arg1 = arb1.generate()
+            val arg2 = arb2.generate()
+            val arg3 = arb3.generate()
+            val arg4 = arb4.generate()
+            val arg5 = arb5.generate()
             if (!test(arg1, arg2, arg3, arg4, arg5)) {
                 throw AssertionError("Proposition failed for " +
                                      "arg1 = $arg1; arg2 = $arg2; arg3 = $arg3; " +
@@ -97,22 +97,22 @@ object Proposition {
     }
 
     fun <P1, P2, P3, P4, P5, P6> forAll(
-            gen1: Gen<P1>,
-            gen2: Gen<P2>,
-            gen3: Gen<P3>,
-            gen4: Gen<P4>,
-            gen5: Gen<P5>,
-            gen6: Gen<P6>,
+            arb1: Arbitrary<P1>,
+            arb2: Arbitrary<P2>,
+            arb3: Arbitrary<P3>,
+            arb4: Arbitrary<P4>,
+            arb5: Arbitrary<P5>,
+            arb6: Arbitrary<P6>,
             times: Int,
             test: (P1, P2, P3, P4, P5, P6) -> Boolean
     ): () -> Unit = {
         repeat(times) {
-            val arg1 = gen1.generate()
-            val arg2 = gen2.generate()
-            val arg3 = gen3.generate()
-            val arg4 = gen4.generate()
-            val arg5 = gen5.generate()
-            val arg6 = gen6.generate()
+            val arg1 = arb1.generate()
+            val arg2 = arb2.generate()
+            val arg3 = arb3.generate()
+            val arg4 = arb4.generate()
+            val arg5 = arb5.generate()
+            val arg6 = arb6.generate()
             if (!test(arg1, arg2, arg3, arg4, arg5, arg6)) {
                 throw AssertionError("Proposition failed for " +
                                      "arg1 = $arg1; arg2 = $arg2; arg3 = $arg3; " +
@@ -122,24 +122,24 @@ object Proposition {
     }
 
     fun <P1, P2, P3, P4, P5, P6, P7> forAll(
-            gen1: Gen<P1>,
-            gen2: Gen<P2>,
-            gen3: Gen<P3>,
-            gen4: Gen<P4>,
-            gen5: Gen<P5>,
-            gen6: Gen<P6>,
-            gen7: Gen<P7>,
+            arb1: Arbitrary<P1>,
+            arb2: Arbitrary<P2>,
+            arb3: Arbitrary<P3>,
+            arb4: Arbitrary<P4>,
+            arb5: Arbitrary<P5>,
+            arb6: Arbitrary<P6>,
+            arb7: Arbitrary<P7>,
             times: Int,
             test: (P1, P2, P3, P4, P5, P6, P7) -> Boolean
     ): () -> Unit = {
         repeat(times) {
-            val arg1 = gen1.generate()
-            val arg2 = gen2.generate()
-            val arg3 = gen3.generate()
-            val arg4 = gen4.generate()
-            val arg5 = gen5.generate()
-            val arg6 = gen6.generate()
-            val arg7 = gen7.generate()
+            val arg1 = arb1.generate()
+            val arg2 = arb2.generate()
+            val arg3 = arb3.generate()
+            val arg4 = arb4.generate()
+            val arg5 = arb5.generate()
+            val arg6 = arb6.generate()
+            val arg7 = arb7.generate()
             if (!test(arg1, arg2, arg3, arg4, arg5, arg6, arg7)) {
                 throw AssertionError("Proposition failed for " +
                                      "arg1 = $arg1; arg2 = $arg2; arg3 = $arg3; " +
@@ -150,26 +150,26 @@ object Proposition {
     }
 
     fun <P1, P2, P3, P4, P5, P6, P7, P8> forAll(
-            gen1: Gen<P1>,
-            gen2: Gen<P2>,
-            gen3: Gen<P3>,
-            gen4: Gen<P4>,
-            gen5: Gen<P5>,
-            gen6: Gen<P6>,
-            gen7: Gen<P7>,
-            gen8: Gen<P8>,
+            arb1: Arbitrary<P1>,
+            arb2: Arbitrary<P2>,
+            arb3: Arbitrary<P3>,
+            arb4: Arbitrary<P4>,
+            arb5: Arbitrary<P5>,
+            arb6: Arbitrary<P6>,
+            arb7: Arbitrary<P7>,
+            arb8: Arbitrary<P8>,
             times: Int,
             test: (P1, P2, P3, P4, P5, P6, P7, P8) -> Boolean
     ): () -> Unit = {
         repeat(times) {
-            val arg1 = gen1.generate()
-            val arg2 = gen2.generate()
-            val arg3 = gen3.generate()
-            val arg4 = gen4.generate()
-            val arg5 = gen5.generate()
-            val arg6 = gen6.generate()
-            val arg7 = gen7.generate()
-            val arg8 = gen8.generate()
+            val arg1 = arb1.generate()
+            val arg2 = arb2.generate()
+            val arg3 = arb3.generate()
+            val arg4 = arb4.generate()
+            val arg5 = arb5.generate()
+            val arg6 = arb6.generate()
+            val arg7 = arb7.generate()
+            val arg8 = arb8.generate()
             if (!test(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8)) {
                 throw AssertionError("Proposition failed for " +
                                      "arg1 = $arg1; arg2 = $arg2; arg3 = $arg3; " +
@@ -180,28 +180,28 @@ object Proposition {
     }
 
     fun <P1, P2, P3, P4, P5, P6, P7, P8, P9> forAll(
-            gen1: Gen<P1>,
-            gen2: Gen<P2>,
-            gen3: Gen<P3>,
-            gen4: Gen<P4>,
-            gen5: Gen<P5>,
-            gen6: Gen<P6>,
-            gen7: Gen<P7>,
-            gen8: Gen<P8>,
-            gen9: Gen<P9>,
+            arb1: Arbitrary<P1>,
+            arb2: Arbitrary<P2>,
+            arb3: Arbitrary<P3>,
+            arb4: Arbitrary<P4>,
+            arb5: Arbitrary<P5>,
+            arb6: Arbitrary<P6>,
+            arb7: Arbitrary<P7>,
+            arb8: Arbitrary<P8>,
+            arb9: Arbitrary<P9>,
             times: Int,
             test: (P1, P2, P3, P4, P5, P6, P7, P8, P9) -> Boolean
     ): () -> Unit = {
         repeat(times) {
-            val arg1 = gen1.generate()
-            val arg2 = gen2.generate()
-            val arg3 = gen3.generate()
-            val arg4 = gen4.generate()
-            val arg5 = gen5.generate()
-            val arg6 = gen6.generate()
-            val arg7 = gen7.generate()
-            val arg8 = gen8.generate()
-            val arg9 = gen9.generate()
+            val arg1 = arb1.generate()
+            val arg2 = arb2.generate()
+            val arg3 = arb3.generate()
+            val arg4 = arb4.generate()
+            val arg5 = arb5.generate()
+            val arg6 = arb6.generate()
+            val arg7 = arb7.generate()
+            val arg8 = arb8.generate()
+            val arg9 = arb9.generate()
             if (!test(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9)) {
                 throw AssertionError("Proposition failed for " +
                                      "arg1 = $arg1; arg2 = $arg2; arg3 = $arg3; " +
@@ -216,7 +216,7 @@ object Proposition {
 /** PropSpec API extensions */
 
 inline fun <reified P> PropSpec.forAll(
-        gen: Gen<P> = Gen.default<P>(),
+        gen: Arbitrary<P> = Arbitrary.default<P>(),
         times: Int = Proposition.DEFAULT_TIMES,
         noinline test: (P) -> Boolean
 ): TestCase {
@@ -226,72 +226,72 @@ inline fun <reified P> PropSpec.forAll(
 }
 
 inline fun <reified P1, reified P2> PropSpec.forAll(
-        gen1: Gen<P1> = Gen.default<P1>(),
-        gen2: Gen<P2> = Gen.default<P2>(),
+        arb1: Arbitrary<P1> = Arbitrary.default<P1>(),
+        arb2: Arbitrary<P2> = Arbitrary.default<P2>(),
         times: Int = Proposition.DEFAULT_TIMES,
         noinline test: (P1, P2) -> Boolean
 ): TestCase {
-    val testCase = createTestCaseForCurrentSuite(Proposition.forAll(gen1, gen2, times, test))
+    val testCase = createTestCaseForCurrentSuite(Proposition.forAll(arb1, arb2, times, test))
     addTestCaseToCurrentSuite(testCase)
     return testCase
 }
 
 inline fun <reified P1, reified P2, reified P3> PropSpec.forAll(
-        gen1: Gen<P1> = Gen.default<P1>(),
-        gen2: Gen<P2> = Gen.default<P2>(),
-        gen3: Gen<P3> = Gen.default<P3>(),
+        arb1: Arbitrary<P1> = Arbitrary.default<P1>(),
+        arb2: Arbitrary<P2> = Arbitrary.default<P2>(),
+        arb3: Arbitrary<P3> = Arbitrary.default<P3>(),
         times: Int = Proposition.DEFAULT_TIMES,
         noinline test: (P1, P2, P3) -> Boolean
 ): TestCase {
-    val testCase = createTestCaseForCurrentSuite(Proposition.forAll(gen1, gen2, gen3, times, test))
+    val testCase = createTestCaseForCurrentSuite(Proposition.forAll(arb1, arb2, arb3, times, test))
     addTestCaseToCurrentSuite(testCase)
     return testCase
 }
 
 inline fun <reified P1, reified P2, reified P3,
             reified P4> PropSpec.forAll(
-        gen1: Gen<P1> = Gen.default<P1>(),
-        gen2: Gen<P2> = Gen.default<P2>(),
-        gen3: Gen<P3> = Gen.default<P3>(),
-        gen4: Gen<P4> = Gen.default<P4>(),
+        arb1: Arbitrary<P1> = Arbitrary.default<P1>(),
+        arb2: Arbitrary<P2> = Arbitrary.default<P2>(),
+        arb3: Arbitrary<P3> = Arbitrary.default<P3>(),
+        arb4: Arbitrary<P4> = Arbitrary.default<P4>(),
         times: Int = Proposition.DEFAULT_TIMES,
         noinline test: (P1, P2, P3, P4) -> Boolean
 ): TestCase {
     val testCase = createTestCaseForCurrentSuite(
-            Proposition.forAll(gen1, gen2, gen3, gen4, times, test))
+            Proposition.forAll(arb1, arb2, arb3, arb4, times, test))
     addTestCaseToCurrentSuite(testCase)
     return testCase
 }
 
 inline fun <reified P1, reified P2, reified P3,
             reified P4, reified P5> PropSpec.forAll(
-        gen1: Gen<P1> = Gen.default<P1>(),
-        gen2: Gen<P2> = Gen.default<P2>(),
-        gen3: Gen<P3> = Gen.default<P3>(),
-        gen4: Gen<P4> = Gen.default<P4>(),
-        gen5: Gen<P5> = Gen.default<P5>(),
+        arb1: Arbitrary<P1> = Arbitrary.default<P1>(),
+        arb2: Arbitrary<P2> = Arbitrary.default<P2>(),
+        arb3: Arbitrary<P3> = Arbitrary.default<P3>(),
+        arb4: Arbitrary<P4> = Arbitrary.default<P4>(),
+        arb5: Arbitrary<P5> = Arbitrary.default<P5>(),
         times: Int = Proposition.DEFAULT_TIMES,
         noinline test: (P1, P2, P3, P4, P5) -> Boolean
 ): TestCase {
     val testCase = createTestCaseForCurrentSuite(
-            Proposition.forAll(gen1, gen2, gen3, gen4, gen5, times, test))
+            Proposition.forAll(arb1, arb2, arb3, arb4, arb5, times, test))
     addTestCaseToCurrentSuite(testCase)
     return testCase
 }
 
 inline fun <reified P1, reified P2, reified P3,
             reified P4, reified P5, reified P6> PropSpec.forAll(
-        gen1: Gen<P1> = Gen.default<P1>(),
-        gen2: Gen<P2> = Gen.default<P2>(),
-        gen3: Gen<P3> = Gen.default<P3>(),
-        gen4: Gen<P4> = Gen.default<P4>(),
-        gen5: Gen<P5> = Gen.default<P5>(),
-        gen6: Gen<P6> = Gen.default<P6>(),
+        arb1: Arbitrary<P1> = Arbitrary.default<P1>(),
+        arb2: Arbitrary<P2> = Arbitrary.default<P2>(),
+        arb3: Arbitrary<P3> = Arbitrary.default<P3>(),
+        arb4: Arbitrary<P4> = Arbitrary.default<P4>(),
+        arb5: Arbitrary<P5> = Arbitrary.default<P5>(),
+        arb6: Arbitrary<P6> = Arbitrary.default<P6>(),
         times: Int = Proposition.DEFAULT_TIMES,
         noinline test: (P1, P2, P3, P4, P5, P6) -> Boolean
 ): TestCase {
     val testCase = createTestCaseForCurrentSuite(
-            Proposition.forAll(gen1, gen2, gen3, gen4, gen5, gen6, times, test))
+            Proposition.forAll(arb1, arb2, arb3, arb4, arb5, arb6, times, test))
     addTestCaseToCurrentSuite(testCase)
     return testCase
 }
@@ -299,18 +299,18 @@ inline fun <reified P1, reified P2, reified P3,
 inline fun <reified P1, reified P2, reified P3,
             reified P4, reified P5, reified P6,
             reified P7> PropSpec.forAll(
-        gen1: Gen<P1> = Gen.default<P1>(),
-        gen2: Gen<P2> = Gen.default<P2>(),
-        gen3: Gen<P3> = Gen.default<P3>(),
-        gen4: Gen<P4> = Gen.default<P4>(),
-        gen5: Gen<P5> = Gen.default<P5>(),
-        gen6: Gen<P6> = Gen.default<P6>(),
-        gen7: Gen<P7> = Gen.default<P7>(),
+        arb1: Arbitrary<P1> = Arbitrary.default<P1>(),
+        arb2: Arbitrary<P2> = Arbitrary.default<P2>(),
+        arb3: Arbitrary<P3> = Arbitrary.default<P3>(),
+        arb4: Arbitrary<P4> = Arbitrary.default<P4>(),
+        arb5: Arbitrary<P5> = Arbitrary.default<P5>(),
+        arb6: Arbitrary<P6> = Arbitrary.default<P6>(),
+        arb7: Arbitrary<P7> = Arbitrary.default<P7>(),
         times: Int = Proposition.DEFAULT_TIMES,
         noinline test: (P1, P2, P3, P4, P5, P6, P7) -> Boolean
 ): TestCase {
     val testCase = createTestCaseForCurrentSuite(
-            Proposition.forAll(gen1, gen2, gen3, gen4, gen5, gen6, gen7, times, test))
+            Proposition.forAll(arb1, arb2, arb3, arb4, arb5, arb6, arb7, times, test))
     addTestCaseToCurrentSuite(testCase)
     return testCase
 }
@@ -318,19 +318,19 @@ inline fun <reified P1, reified P2, reified P3,
 inline fun <reified P1, reified P2, reified P3,
             reified P4, reified P5, reified P6,
             reified P7, reified P8> PropSpec.forAll(
-        gen1: Gen<P1> = Gen.default<P1>(),
-        gen2: Gen<P2> = Gen.default<P2>(),
-        gen3: Gen<P3> = Gen.default<P3>(),
-        gen4: Gen<P4> = Gen.default<P4>(),
-        gen5: Gen<P5> = Gen.default<P5>(),
-        gen6: Gen<P6> = Gen.default<P6>(),
-        gen7: Gen<P7> = Gen.default<P7>(),
-        gen8: Gen<P8> = Gen.default<P8>(),
+        arb1: Arbitrary<P1> = Arbitrary.default<P1>(),
+        arb2: Arbitrary<P2> = Arbitrary.default<P2>(),
+        arb3: Arbitrary<P3> = Arbitrary.default<P3>(),
+        arb4: Arbitrary<P4> = Arbitrary.default<P4>(),
+        arb5: Arbitrary<P5> = Arbitrary.default<P5>(),
+        arb6: Arbitrary<P6> = Arbitrary.default<P6>(),
+        arb7: Arbitrary<P7> = Arbitrary.default<P7>(),
+        arb8: Arbitrary<P8> = Arbitrary.default<P8>(),
         times: Int = Proposition.DEFAULT_TIMES,
         noinline test: (P1, P2, P3, P4, P5, P6, P7, P8) -> Boolean
 ): TestCase {
     val testCase = createTestCaseForCurrentSuite(
-            Proposition.forAll(gen1, gen2, gen3, gen4, gen5, gen6, gen7, gen8, times, test))
+            Proposition.forAll(arb1, arb2, arb3, arb4, arb5, arb6, arb7, arb8, times, test))
     addTestCaseToCurrentSuite(testCase)
     return testCase
 }
@@ -338,20 +338,20 @@ inline fun <reified P1, reified P2, reified P3,
 inline fun <reified P1, reified P2, reified P3,
             reified P4, reified P5, reified P6,
             reified P7, reified P8, reified P9> PropSpec.forAll(
-        gen1: Gen<P1> = Gen.default<P1>(),
-        gen2: Gen<P2> = Gen.default<P2>(),
-        gen3: Gen<P3> = Gen.default<P3>(),
-        gen4: Gen<P4> = Gen.default<P4>(),
-        gen5: Gen<P5> = Gen.default<P5>(),
-        gen6: Gen<P6> = Gen.default<P6>(),
-        gen7: Gen<P7> = Gen.default<P7>(),
-        gen8: Gen<P8> = Gen.default<P8>(),
-        gen9: Gen<P9> = Gen.default<P9>(),
+        arb1: Arbitrary<P1> = Arbitrary.default<P1>(),
+        arb2: Arbitrary<P2> = Arbitrary.default<P2>(),
+        arb3: Arbitrary<P3> = Arbitrary.default<P3>(),
+        arb4: Arbitrary<P4> = Arbitrary.default<P4>(),
+        arb5: Arbitrary<P5> = Arbitrary.default<P5>(),
+        arb6: Arbitrary<P6> = Arbitrary.default<P6>(),
+        arb7: Arbitrary<P7> = Arbitrary.default<P7>(),
+        arb8: Arbitrary<P8> = Arbitrary.default<P8>(),
+        arb9: Arbitrary<P9> = Arbitrary.default<P9>(),
         times: Int = Proposition.DEFAULT_TIMES,
         noinline test: (P1, P2, P3, P4, P5, P6, P7, P8, P9) -> Boolean
 ): TestCase {
     val testCase = createTestCaseForCurrentSuite(
-            Proposition.forAll(gen1, gen2, gen3, gen4, gen5, gen6, gen7, gen8, gen9, times, test))
+            Proposition.forAll(arb1, arb2, arb3, arb4, arb5, arb6, arb7, arb8, arb9, times, test))
     addTestCaseToCurrentSuite(testCase)
     return testCase
 }
