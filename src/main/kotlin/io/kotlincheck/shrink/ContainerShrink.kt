@@ -15,29 +15,42 @@ class MutableListShrinker<T>(
             test: (MutableList<T>) -> Boolean,
             counterexample: MutableList<T>
     ): MutableList<T> {
-        var shrinked = ArrayList(counterexample)
+        var counterNew = ArrayList(counterexample)
 
-        if (!fixedSize) {
-            val intShrinker = IntShrinker(0, sizeBound)
-            val newSize = intShrinker.shrink(
-                    { test(counterexample.subList(0, it)) },
-                    shrinked.size
-            )
-            shrinked = ArrayList(shrinked.subList(0, newSize))
-        }
+        do {
+            val counterOld = ArrayList(counterNew)
+            if (!fixedSize) {
+                val intShrinker = IntShrinker(0, sizeBound)
+
+                val newSize = intShrinker.shrink(
+                        { test(counterNew.subList(0, it)) },
+                        counterNew.size
+                )
+                counterNew = ArrayList(counterNew.subList(0, newSize))
+
+                val counterNewReversed = counterNew.asReversed()
+                if (!test(counterNewReversed)) {
+                    val newSizeReversed = intShrinker.shrink(
+                            { test(counterNewReversed.subList(0, it)) },
+                            counterNew.size
+                    )
+                    counterNew = ArrayList(counterNewReversed.subList(0, newSizeReversed).asReversed())
+                }
+            }
 
 
-        for (i in shrinked.indices) {
-            shrinked[i] = shrinker.shrink(
-                    {
-                        shrinked[i] = it
-                        test(shrinked)
-                    },
-                    shrinked[i]
-            )
-        }
+            for (i in counterNew.indices) {
+                counterNew[i] = shrinker.shrink(
+                        {
+                            counterNew[i] = it
+                            test(counterNew)
+                        },
+                        counterNew[i]
+                )
+            }
+        } while (counterOld != counterNew)
 
-        return shrinked
+        return counterNew
     }
 }
 
