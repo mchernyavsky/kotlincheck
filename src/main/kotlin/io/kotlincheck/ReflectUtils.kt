@@ -11,4 +11,9 @@ interface TypeParameterProvider<out T> {
         val type = parameterizedType2.actualTypeArguments[index]
         return if (type is WildcardType) type.upperBounds.first() else type
     }
+
+    companion object {
+        inline fun <reified T> getNthTypeParameter(index: Int): Type =
+                object : TypeParameterProvider<T> {}.getNthTypeParameter(index)
+    }
 }

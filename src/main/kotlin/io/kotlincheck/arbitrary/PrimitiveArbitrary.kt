@@ -43,17 +43,19 @@ class FloatArbitrary(
         val bound: Float = Float.MAX_VALUE
 ) : Arbitrary<Float>(FloatGen(origin, bound), FloatShrinker(origin, bound))
 
-class BigDecimalArbitrary(val origin: BigDecimal, val bound: BigDecimal
+class BigDecimalArbitrary(
+        val origin: BigDecimal,
+        val bound: BigDecimal
 ) : Arbitrary<BigDecimal>(BigDecimalGen(origin, bound), BigDecimalShrinker(origin, bound))
 
-class BigIntegerArbitrary(val origin: BigInteger, val bound: BigInteger
+class BigIntegerArbitrary(
+        val origin: BigInteger,
+        val bound: BigInteger
 ) : Arbitrary<BigInteger>(BigIntegerGen(origin, bound), BigIntegerShrinker(origin, bound))
 
-class OneOfArbitrary<T>(val values: List<T>) : Arbitrary<T>(OneOfGen(values), OneOfShrinker(values)) {
+class OneOfArbitrary<T>(values: List<T>) : Arbitrary<T>(OneOfGen(values), OneOfShrinker(values)) {
 
     constructor(values: Array<T>) : this(values.asList())
 
     constructor(values: Set<T>) : this(values.toList())
-
-    override fun generate(): T = values[Random.nextInt(0, values.size)]
 }

@@ -4,7 +4,6 @@ import io.kotlincheck.gen.MutableListGen
 import io.kotlincheck.gen.MutableMapGen
 import io.kotlincheck.gen.MutableSetGen
 import io.kotlincheck.gen.StringGen
-import io.kotlincheck.shrink.DummyShrinker
 import io.kotlincheck.shrink.MutableListShrinker
 import io.kotlincheck.shrink.StringShrinker
 
@@ -30,39 +29,27 @@ class SetArbitrary<T>(
         arb: Arbitrary<T>,
         sizeBound: Int = Arbitrary.DEFAULT_CONTAINER_SIZE_BOUND,
         fixedSize: Boolean = false
-) : Arbitrary<Set<T>>(
-        MutableSetGen(arb, sizeBound, fixedSize),
-        DummyShrinker()
-)
+) : Arbitrary<Set<T>>(MutableSetGen(arb, sizeBound, fixedSize))
 
 class MutableSetArbitrary<T>(
         arb: Arbitrary<T>,
         sizeBound: Int = Arbitrary.DEFAULT_CONTAINER_SIZE_BOUND,
         fixedSize: Boolean = false
-) : Arbitrary<MutableSet<T>>(
-        MutableSetGen(arb, sizeBound, fixedSize),
-        DummyShrinker()
-)
+) : Arbitrary<MutableSet<T>>(MutableSetGen(arb, sizeBound, fixedSize))
 
 class MapArbitrary<K, V>(
         keyArb: Arbitrary<K>,
         valueArb: Arbitrary<V>,
         sizeBound: Int = Arbitrary.DEFAULT_CONTAINER_SIZE_BOUND,
         fixedSize: Boolean = false
-) : Arbitrary<Map<K, V>>(
-        MutableMapGen(keyArb, valueArb, sizeBound, fixedSize),
-        DummyShrinker()
-)
+) : Arbitrary<Map<K, V>>(MutableMapGen(keyArb, valueArb, sizeBound, fixedSize))
 
 class MutableMapArbitrary<K, V>(
         keyArb: Arbitrary<K>,
         valueArb: Arbitrary<V>,
         sizeBound: Int = Arbitrary.DEFAULT_CONTAINER_SIZE_BOUND,
         fixedSize: Boolean = false
-) : Arbitrary<MutableMap<K, V>>(
-        MutableMapGen(keyArb, valueArb, sizeBound, fixedSize),
-        DummyShrinker()
-)
+) : Arbitrary<MutableMap<K, V>>(MutableMapGen(keyArb, valueArb, sizeBound, fixedSize))
 
 class StringArbitrary(
         sizeBound: Int = Arbitrary.DEFAULT_CONTAINER_SIZE_BOUND,
