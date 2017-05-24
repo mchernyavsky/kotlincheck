@@ -35,8 +35,14 @@ class LongShrinker(val origin: Long, val bound: Long) : Shrinker<Long> {
             val mid = (low + high) / 2
             val result = test(mid)
             if (result && toHigh || !result && !toHigh) {
+                if (high == mid) {
+                    return low
+                }
                 high = mid
             } else {
+                if (low == mid) {
+                    return high
+                }
                 low = mid
             }
         }
