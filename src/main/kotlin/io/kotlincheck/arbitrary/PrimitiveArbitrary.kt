@@ -59,3 +59,10 @@ class OneOfArbitrary<T>(values: List<T>) : Arbitrary<T>(OneOfGen(values), OneOfS
 
     constructor(values: Set<T>) : this(values.toList())
 }
+
+class OneOfGenArbitrary<T>(gens: List<Gen<T>>) : Arbitrary<T>(OneOfGenGen(gens)) {
+
+    constructor(values: Array<Gen<T>>) : this(values.asList())
+
+    constructor(values: Set<Gen<T>>) : this(values.toList())
+}

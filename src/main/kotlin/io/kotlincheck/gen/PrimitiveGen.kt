@@ -47,3 +47,7 @@ class BigIntegerGen(val origin: BigInteger, val bound: BigInteger) : Gen<BigInte
 class OneOfGen<out T>(val values: List<T>) : Gen<T> {
     override fun generate(): T = values[Random.nextInt(0, values.size)]
 }
+
+class OneOfGenGen<out T>(val gens: List<Gen<T>>) : Gen<T> {
+    override fun generate(): T = gens[Random.nextInt(0, gens.size)].generate()
+}
