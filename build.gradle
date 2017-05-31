@@ -2,7 +2,7 @@ group 'io.kotlincheck'
 version '0.0.1-SNAPSHOT'
 
 buildscript {
-    ext.kotlin_version = '1.1.1'
+    ext.kotlin_version = '1.1.2-3'
 
     repositories {
         mavenCentral()
@@ -18,10 +18,17 @@ apply plugin: 'kotlin'
 repositories {
     mavenCentral()
     jcenter()
+    maven {
+        url 'https://dl.bintray.com/kotlin/exposed'
+    }
 }
 
 dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     compile "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
     compile 'io.kotlintest:kotlintest:2.0.0'
+    compile 'org.slf4j:slf4j-simple:1.7.25'
+    compile 'com.h2database:h2:1.4.195'
+    compile 'org.jetbrains.exposed:exposed:0.8'
+    compile 'org.apache.commons:commons-lang3:3.5'
 }

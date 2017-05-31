@@ -11,6 +11,13 @@ abstract class PropSpec(body: PropSpec.() -> Unit = {}) : Spec() {
     private var currentSuite = rootTestSuite
     private var propositionNum = 0
 
+    val propositionFullName
+        get() = listOf(
+                javaClass.name,
+                currentSuite.name,
+                propositionNum
+        ).joinToString("/")
+
     init {
         body()
     }

@@ -2,22 +2,34 @@ package io.kotlincheck
 
 import io.kotlincheck.arbitrary.*
 import io.kotlintest.TestCase
-
+import java.io.Serializable
 
 object Proposition {
     val DEFAULT_TIMES = 300
 
-    fun <P> forAll(arb: Arbitrary<P>, times: Int, test: (P) -> Boolean): () -> Unit = {
+    fun <P> forAll(
+            propositionFullName: String,
+            arb: Arbitrary<P>, times: Int,
+            test: (P) -> Boolean
+    ): () -> Unit = {
+        CounterexampleStorage.loadCounterexamples<P>(propositionFullName)
+                .find { !test(it) }
+                ?.let { throw AssertionError("Proposition failed. Counterexample: $it") }
+
         repeat(times) {
             var arg = arb.generate()
             if (!test(arg)) {
                 arg = arb.shrink(test, arg)
+                if (arg is Serializable) {
+                    CounterexampleStorage.saveCounterexample(propositionFullName, arg)
+                }
                 throw AssertionError("Proposition failed. Counterexample: $arg")
             }
         }
     }
 
     fun <P1, P2> forAll(
+            propositionFullName: String,
             arb1: Arbitrary<P1>,
             arb2: Arbitrary<P2>,
             times: Int,
@@ -25,10 +37,11 @@ object Proposition {
     ): () -> Unit {
         val arbs = Tuple2Arbitary(arb1, arb2)
         val testTupled = { (arg1, arg2): Tuple2<P1, P2> -> test(arg1, arg2) }
-        return forAll(arbs, times, testTupled)
+        return forAll(propositionFullName, arbs, times, testTupled)
     }
 
     fun <P1, P2, P3> forAll(
+            propositionFullName: String,
             arb1: Arbitrary<P1>,
             arb2: Arbitrary<P2>,
             arb3: Arbitrary<P3>,
@@ -37,10 +50,11 @@ object Proposition {
     ): () -> Unit {
         val arbs = Tuple3Arbitary(arb1, arb2, arb3)
         val testTupled = { (arg1, arg2, arg3): Tuple3<P1, P2, P3> -> test(arg1, arg2, arg3) }
-        return forAll(arbs, times, testTupled)
+        return forAll(propositionFullName, arbs, times, testTupled)
     }
 
     fun <P1, P2, P3, P4> forAll(
+            propositionFullName: String,
             arb1: Arbitrary<P1>,
             arb2: Arbitrary<P2>,
             arb3: Arbitrary<P3>,
@@ -50,10 +64,11 @@ object Proposition {
     ): () -> Unit {
         val arbs = Tuple4Arbitary(arb1, arb2, arb3, arb4)
         val testTupled = { (arg1, arg2, arg3, arg4): Tuple4<P1, P2, P3, P4> -> test(arg1, arg2, arg3, arg4) }
-        return forAll(arbs, times, testTupled)
+        return forAll(propositionFullName, arbs, times, testTupled)
     }
 
     fun <P1, P2, P3, P4, P5> forAll(
+            propositionFullName: String,
             arb1: Arbitrary<P1>,
             arb2: Arbitrary<P2>,
             arb3: Arbitrary<P3>,
@@ -67,10 +82,11 @@ object Proposition {
             (arg1, arg2, arg3, arg4, arg5): Tuple5<P1, P2, P3, P4, P5> ->
             test(arg1, arg2, arg3, arg4, arg5)
         }
-        return forAll(arbs, times, testTupled)
+        return forAll(propositionFullName, arbs, times, testTupled)
     }
 
     fun <P1, P2, P3, P4, P5, P6> forAll(
+            propositionFullName: String,
             arb1: Arbitrary<P1>,
             arb2: Arbitrary<P2>,
             arb3: Arbitrary<P3>,
@@ -85,10 +101,11 @@ object Proposition {
             (arg1, arg2, arg3, arg4, arg5, arg6): Tuple6<P1, P2, P3, P4, P5, P6> ->
             test(arg1, arg2, arg3, arg4, arg5, arg6)
         }
-        return forAll(arbs, times, testTupled)
+        return forAll(propositionFullName, arbs, times, testTupled)
     }
 
     fun <P1, P2, P3, P4, P5, P6, P7> forAll(
+            propositionFullName: String,
             arb1: Arbitrary<P1>,
             arb2: Arbitrary<P2>,
             arb3: Arbitrary<P3>,
@@ -104,10 +121,11 @@ object Proposition {
             (arg1, arg2, arg3, arg4, arg5, arg6, arg7): Tuple7<P1, P2, P3, P4, P5, P6, P7> ->
             test(arg1, arg2, arg3, arg4, arg5, arg6, arg7)
         }
-        return forAll(arbs, times, testTupled)
+        return forAll(propositionFullName, arbs, times, testTupled)
     }
 
     fun <P1, P2, P3, P4, P5, P6, P7, P8> forAll(
+            propositionFullName: String,
             arb1: Arbitrary<P1>,
             arb2: Arbitrary<P2>,
             arb3: Arbitrary<P3>,
@@ -124,10 +142,11 @@ object Proposition {
             (arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8): Tuple8<P1, P2, P3, P4, P5, P6, P7, P8> ->
             test(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8)
         }
-        return forAll(arbs, times, testTupled)
+        return forAll(propositionFullName, arbs, times, testTupled)
     }
 
     fun <P1, P2, P3, P4, P5, P6, P7, P8, P9> forAll(
+            propositionFullName: String,
             arb1: Arbitrary<P1>,
             arb2: Arbitrary<P2>,
             arb3: Arbitrary<P3>,
@@ -145,7 +164,7 @@ object Proposition {
             (arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9): Tuple9<P1, P2, P3, P4, P5, P6, P7, P8, P9> ->
             test(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9)
         }
-        return forAll(arbs, times, testTupled)
+        return forAll(propositionFullName, arbs, times, testTupled)
     }
 }
 
@@ -156,7 +175,8 @@ inline fun <reified P> PropSpec.forAll(
         times: Int = Proposition.DEFAULT_TIMES,
         noinline test: (P) -> Boolean
 ): TestCase {
-    val testCase = createTestCaseForCurrentSuite(Proposition.forAll(arb, times, test))
+    val testCase = createTestCaseForCurrentSuite(
+            Proposition.forAll(propositionFullName, arb, times, test))
     addTestCaseToCurrentSuite(testCase)
     return testCase
 }
@@ -167,7 +187,8 @@ inline fun <reified P1, reified P2> PropSpec.forAll(
         times: Int = Proposition.DEFAULT_TIMES,
         noinline test: (P1, P2) -> Boolean
 ): TestCase {
-    val testCase = createTestCaseForCurrentSuite(Proposition.forAll(arb1, arb2, times, test))
+    val testCase = createTestCaseForCurrentSuite(
+            Proposition.forAll(propositionFullName, arb1, arb2, times, test))
     addTestCaseToCurrentSuite(testCase)
     return testCase
 }
@@ -179,7 +200,8 @@ inline fun <reified P1, reified P2, reified P3> PropSpec.forAll(
         times: Int = Proposition.DEFAULT_TIMES,
         noinline test: (P1, P2, P3) -> Boolean
 ): TestCase {
-    val testCase = createTestCaseForCurrentSuite(Proposition.forAll(arb1, arb2, arb3, times, test))
+    val testCase = createTestCaseForCurrentSuite(
+            Proposition.forAll(propositionFullName, arb1, arb2, arb3, times, test))
     addTestCaseToCurrentSuite(testCase)
     return testCase
 }
@@ -194,7 +216,7 @@ inline fun <reified P1, reified P2, reified P3,
         noinline test: (P1, P2, P3, P4) -> Boolean
 ): TestCase {
     val testCase = createTestCaseForCurrentSuite(
-            Proposition.forAll(arb1, arb2, arb3, arb4, times, test))
+            Proposition.forAll(propositionFullName, arb1, arb2, arb3, arb4, times, test))
     addTestCaseToCurrentSuite(testCase)
     return testCase
 }
@@ -210,7 +232,7 @@ inline fun <reified P1, reified P2, reified P3,
         noinline test: (P1, P2, P3, P4, P5) -> Boolean
 ): TestCase {
     val testCase = createTestCaseForCurrentSuite(
-            Proposition.forAll(arb1, arb2, arb3, arb4, arb5, times, test))
+            Proposition.forAll(propositionFullName, arb1, arb2, arb3, arb4, arb5, times, test))
     addTestCaseToCurrentSuite(testCase)
     return testCase
 }
@@ -227,7 +249,7 @@ inline fun <reified P1, reified P2, reified P3,
         noinline test: (P1, P2, P3, P4, P5, P6) -> Boolean
 ): TestCase {
     val testCase = createTestCaseForCurrentSuite(
-            Proposition.forAll(arb1, arb2, arb3, arb4, arb5, arb6, times, test))
+            Proposition.forAll(propositionFullName, arb1, arb2, arb3, arb4, arb5, arb6, times, test))
     addTestCaseToCurrentSuite(testCase)
     return testCase
 }
@@ -246,7 +268,7 @@ inline fun <reified P1, reified P2, reified P3,
         noinline test: (P1, P2, P3, P4, P5, P6, P7) -> Boolean
 ): TestCase {
     val testCase = createTestCaseForCurrentSuite(
-            Proposition.forAll(arb1, arb2, arb3, arb4, arb5, arb6, arb7, times, test))
+            Proposition.forAll(propositionFullName, arb1, arb2, arb3, arb4, arb5, arb6, arb7, times, test))
     addTestCaseToCurrentSuite(testCase)
     return testCase
 }
@@ -266,7 +288,12 @@ inline fun <reified P1, reified P2, reified P3,
         noinline test: (P1, P2, P3, P4, P5, P6, P7, P8) -> Boolean
 ): TestCase {
     val testCase = createTestCaseForCurrentSuite(
-            Proposition.forAll(arb1, arb2, arb3, arb4, arb5, arb6, arb7, arb8, times, test))
+            Proposition.forAll(
+                    propositionFullName,
+                    arb1, arb2, arb3, arb4, arb5, arb6, arb7, arb8,
+                    times, test
+            )
+    )
     addTestCaseToCurrentSuite(testCase)
     return testCase
 }
@@ -287,7 +314,12 @@ inline fun <reified P1, reified P2, reified P3,
         noinline test: (P1, P2, P3, P4, P5, P6, P7, P8, P9) -> Boolean
 ): TestCase {
     val testCase = createTestCaseForCurrentSuite(
-            Proposition.forAll(arb1, arb2, arb3, arb4, arb5, arb6, arb7, arb8, arb9, times, test))
+            Proposition.forAll(
+                    propositionFullName,
+                    arb1, arb2, arb3, arb4, arb5, arb6, arb7, arb8, arb9,
+                    times, test
+            )
+    )
     addTestCaseToCurrentSuite(testCase)
     return testCase
 }
