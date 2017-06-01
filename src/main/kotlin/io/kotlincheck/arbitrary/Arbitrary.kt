@@ -26,12 +26,9 @@ open class Arbitrary<T>(
                 val elemArb = forClassName(type.typeName)
                 requireNotNull(elemArb) { "Cannot infer arbitrary for ${T::class.qualifiedName}" }
                 when (T::class) {
-                    List::class -> ListArbitrary(elemArb!!) as Arbitrary<T>
-                    MutableList::class -> MutableListArbitrary(elemArb!!) as Arbitrary<T>
-                    Set::class -> SetArbitrary(elemArb!!) as Arbitrary<T>
-                    MutableSet::class -> MutableSetArbitrary(elemArb!!) as Arbitrary<T>
-                    else -> throw IllegalArgumentException("Cannot infer arbitrary for " +
-                                                           "${T::class.qualifiedName}")
+                    List::class, MutableList::class -> MutableListArbitrary(elemArb!!) as Arbitrary<T>
+                    Set::class, MutableSet::class -> MutableSetArbitrary(elemArb!!) as Arbitrary<T>
+                    else -> throw IllegalArgumentException("Cannot infer arbitrary for ${T::class.qualifiedName}")
                 }
             }
             Map::class.isSuperclassOf(T::class) -> {
@@ -42,11 +39,30 @@ open class Arbitrary<T>(
                 val valueArb = forClassName(valueType.typeName)
                 requireNotNull(valueArb) { "Cannot infer arbitrary for ${T::class.qualifiedName}" }
                 when (T::class) {
-                    Map::class -> MapArbitrary(keyArb!!, valueArb!!) as Arbitrary<T>
-                    MutableMap::class -> MutableMapArbitrary(keyArb!!, valueArb!!) as Arbitrary<T>
-                    else -> throw IllegalArgumentException("Cannot infer arbitrary for " +
-                                                           "${T::class.qualifiedName}")
+                    Map::class, MutableMap::class -> MutableMapArbitrary(keyArb!!, valueArb!!) as Arbitrary<T>
+                    else -> throw IllegalArgumentException("Cannot infer arbitrary for ${T::class.qualifiedName}")
                 }
+            }
+            Pair::class.isSuperclassOf(T::class) -> {
+                val firstType = TypeParameterProvider.getNthTypeParameter<T>(0)
+                val firstArb = forClassName(firstType.typeName)
+                requireNotNull(firstArb) { "Cannot infer arbitrary for ${T::class.qualifiedName}" }
+                val secondType = TypeParameterProvider.getNthTypeParameter<T>(1)
+                val secondArb = forClassName(secondType.typeName)
+                requireNotNull(secondArb) { "Cannot infer arbitrary for ${T::class.qualifiedName}" }
+                PairArbitrary(firstArb!!, secondArb!!) as Arbitrary<T>
+            }
+            Triple::class.isSuperclassOf(T::class) -> {
+                val firstType = TypeParameterProvider.getNthTypeParameter<T>(0)
+                val firstArb = forClassName(firstType.typeName)
+                requireNotNull(firstArb) { "Cannot infer arbitrary for ${T::class.qualifiedName}" }
+                val secondType = TypeParameterProvider.getNthTypeParameter<T>(1)
+                val secondArb = forClassName(secondType.typeName)
+                requireNotNull(secondArb) { "Cannot infer arbitrary for ${T::class.qualifiedName}" }
+                val thirdType = TypeParameterProvider.getNthTypeParameter<T>(2)
+                val thirdArb = forClassName(thirdType.typeName)
+                requireNotNull(thirdArb) { "Cannot infer arbitrary for ${T::class.qualifiedName}" }
+                TripleArbitrary(firstArb!!, secondArb!!, thirdArb!!) as Arbitrary<T>
             }
             else -> forClassName(T::class.qualifiedName!!) as Arbitrary<T>
         }
@@ -65,6 +81,8 @@ open class Arbitrary<T>(
             "java.lang.Double", "kotlin.Double" -> DoubleArbitrary()
             "java.lang.Float", "kotlin.Float" -> FloatArbitrary()
             "java.lang.String", "kotlin.String" -> StringArbitrary()
+            "java.math.BigInteger" -> BigIntegerArbitrary()
+            "java.math.BigDecimal" -> BigDecimalArbitrary()
             else -> forArbitraryKClass(Class.forName(className).kotlin, usedClasses, recursionDeep)
         }
 
