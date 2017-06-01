@@ -6,9 +6,7 @@ import org.jetbrains.exposed.dao.EntityID
 import org.jetbrains.exposed.dao.IntEntity
 import org.jetbrains.exposed.dao.IntEntityClass
 import org.jetbrains.exposed.dao.IntIdTable
-import org.jetbrains.exposed.sql.Database
-import org.jetbrains.exposed.sql.SchemaUtils
-import org.jetbrains.exposed.sql.insert
+import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
 import java.io.Serializable
 import javax.sql.rowset.serial.SerialBlob
@@ -22,11 +20,16 @@ object CounterexampleStorage {
     }
 
     fun <P> loadCounterexamples(propositionFullName: String): List<P> = transaction {
-        Counterexample
-                .find { Counterexamples.propositionName eq propositionFullName }
-                .map { it.arguments }
-                .map { it.binaryStream }
-                .map { SerializationUtils.deserialize<P>(it) }
+        try {
+            Counterexample
+                    .find { Counterexamples.propositionName eq propositionFullName }
+                    .map { it.arguments }
+                    .map { it.binaryStream }
+                    .map { SerializationUtils.deserialize<P>(it) }
+        } catch (e: ClassCastException) {
+            Counterexamples.deleteWhere { Counterexamples.propositionName eq propositionFullName }
+            listOf()
+        }
     }
 
     fun saveCounterexample(propositionFullName: String, counterexample: Serializable) {
@@ -40,6 +43,22 @@ object CounterexampleStorage {
             }
         } catch (e: SerializationException) {
             // ignore
+        }
+    }
+
+    fun removeCounterexample(propositionFullName: String, counterexample: Serializable) {
+        val serialized = SerializationUtils.serialize(counterexample)
+        transaction {
+            Counterexamples.deleteWhere {
+                (Counterexamples.propositionName eq propositionFullName) and
+                        (Counterexamples.arguments eq SerialBlob(serialized))
+            }
+        }
+    }
+
+    fun removeCounterexamples(propositionFullName: String) = transaction {
+        Counterexamples.deleteWhere {
+            Counterexamples.propositionName eq propositionFullName
         }
     }
 }

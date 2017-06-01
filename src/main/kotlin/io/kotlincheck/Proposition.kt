@@ -12,9 +12,18 @@ object Proposition {
             arb: Arbitrary<P>, times: Int,
             test: (P) -> Boolean
     ): () -> Unit = {
-        CounterexampleStorage.loadCounterexamples<P>(propositionFullName)
-                .find { !test(it) }
-                ?.let { throw AssertionError("Proposition failed. Counterexample: $it") }
+        val oldCounterexamples = CounterexampleStorage.loadCounterexamples<P>(propositionFullName)
+        try {
+            oldCounterexamples
+                    .filterNot(arb::isAcceptable)
+                    .forEach { CounterexampleStorage.removeCounterexample(propositionFullName, it as Serializable) }
+            oldCounterexamples
+                    .filter(arb::isAcceptable)
+                    .find { !test(it) }
+                    ?.let { throw AssertionError("Proposition failed. Counterexample: $it") }
+        } catch (e: ClassCastException) {
+            CounterexampleStorage.removeCounterexamples(propositionFullName)
+        }
 
         repeat(times) {
             var arg = arb.generate()
@@ -35,7 +44,7 @@ object Proposition {
             times: Int,
             test: (P1, P2) -> Boolean
     ): () -> Unit {
-        val arbs = Tuple2Arbitary(arb1, arb2)
+        val arbs = Tuple2Arbitrary(arb1, arb2)
         val testTupled = { (arg1, arg2): Tuple2<P1, P2> -> test(arg1, arg2) }
         return forAll(propositionFullName, arbs, times, testTupled)
     }
@@ -48,7 +57,7 @@ object Proposition {
             times: Int,
             test: (P1, P2, P3) -> Boolean
     ): () -> Unit {
-        val arbs = Tuple3Arbitary(arb1, arb2, arb3)
+        val arbs = Tuple3Arbitrary(arb1, arb2, arb3)
         val testTupled = { (arg1, arg2, arg3): Tuple3<P1, P2, P3> -> test(arg1, arg2, arg3) }
         return forAll(propositionFullName, arbs, times, testTupled)
     }
@@ -62,7 +71,7 @@ object Proposition {
             times: Int,
             test: (P1, P2, P3, P4) -> Boolean
     ): () -> Unit {
-        val arbs = Tuple4Arbitary(arb1, arb2, arb3, arb4)
+        val arbs = Tuple4Arbitrary(arb1, arb2, arb3, arb4)
         val testTupled = { (arg1, arg2, arg3, arg4): Tuple4<P1, P2, P3, P4> -> test(arg1, arg2, arg3, arg4) }
         return forAll(propositionFullName, arbs, times, testTupled)
     }
@@ -77,7 +86,7 @@ object Proposition {
             times: Int,
             test: (P1, P2, P3, P4, P5) -> Boolean
     ): () -> Unit {
-        val arbs = Tuple5Arbitary(arb1, arb2, arb3, arb4, arb5)
+        val arbs = Tuple5Arbitrary(arb1, arb2, arb3, arb4, arb5)
         val testTupled = {
             (arg1, arg2, arg3, arg4, arg5): Tuple5<P1, P2, P3, P4, P5> ->
             test(arg1, arg2, arg3, arg4, arg5)
@@ -96,7 +105,7 @@ object Proposition {
             times: Int,
             test: (P1, P2, P3, P4, P5, P6) -> Boolean
     ): () -> Unit {
-        val arbs = Tuple6Arbitary(arb1, arb2, arb3, arb4, arb5, arb6)
+        val arbs = Tuple6Arbitrary(arb1, arb2, arb3, arb4, arb5, arb6)
         val testTupled = {
             (arg1, arg2, arg3, arg4, arg5, arg6): Tuple6<P1, P2, P3, P4, P5, P6> ->
             test(arg1, arg2, arg3, arg4, arg5, arg6)
@@ -116,7 +125,7 @@ object Proposition {
             times: Int,
             test: (P1, P2, P3, P4, P5, P6, P7) -> Boolean
     ): () -> Unit {
-        val arbs = Tuple7Arbitary(arb1, arb2, arb3, arb4, arb5, arb6, arb7)
+        val arbs = Tuple7Arbitrary(arb1, arb2, arb3, arb4, arb5, arb6, arb7)
         val testTupled = {
             (arg1, arg2, arg3, arg4, arg5, arg6, arg7): Tuple7<P1, P2, P3, P4, P5, P6, P7> ->
             test(arg1, arg2, arg3, arg4, arg5, arg6, arg7)
@@ -137,7 +146,7 @@ object Proposition {
             times: Int,
             test: (P1, P2, P3, P4, P5, P6, P7, P8) -> Boolean
     ): () -> Unit {
-        val arbs = Tuple8Arbitary(arb1, arb2, arb3, arb4, arb5, arb6, arb7, arb8)
+        val arbs = Tuple8Arbitrary(arb1, arb2, arb3, arb4, arb5, arb6, arb7, arb8)
         val testTupled = {
             (arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8): Tuple8<P1, P2, P3, P4, P5, P6, P7, P8> ->
             test(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8)
@@ -159,7 +168,7 @@ object Proposition {
             times: Int,
             test: (P1, P2, P3, P4, P5, P6, P7, P8, P9) -> Boolean
     ): () -> Unit {
-        val arbs = Tuple9Arbitary(arb1, arb2, arb3, arb4, arb5, arb6, arb7, arb8, arb9)
+        val arbs = Tuple9Arbitrary(arb1, arb2, arb3, arb4, arb5, arb6, arb7, arb8, arb9)
         val testTupled = {
             (arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9): Tuple9<P1, P2, P3, P4, P5, P6, P7, P8, P9> ->
             test(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9)
