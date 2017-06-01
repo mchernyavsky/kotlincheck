@@ -4,7 +4,7 @@ import io.kotlincheck.*
 import io.kotlincheck.gen.*
 import io.kotlincheck.shrink.*
 
-class PairArbitary<A, B>(
+class PairArbitrary<A, B>(
         arb1: Arbitrary<A>,
         arb2: Arbitrary<B>
 ) : Arbitrary<Pair<A, B>>(
@@ -12,7 +12,7 @@ class PairArbitary<A, B>(
         PairShrinker(arb1, arb2)
 )
 
-class TripleArbitary<A, B, C>(
+class TripleArbitrary<A, B, C>(
         arb1: Arbitrary<A>,
         arb2: Arbitrary<B>,
         arb3: Arbitrary<C>
@@ -21,7 +21,7 @@ class TripleArbitary<A, B, C>(
         TripleShrinker(arb1, arb2, arb3)
 )
 
-internal class Tuple2Arbitary<T1, T2>(
+internal class Tuple2Arbitrary<T1, T2>(
         arb1: Arbitrary<T1>,
         arb2: Arbitrary<T2>
 ) : Arbitrary<Tuple2<T1, T2>>(
@@ -29,7 +29,7 @@ internal class Tuple2Arbitary<T1, T2>(
         Tuple2Shrinker(arb1, arb2)
 )
 
-internal class Tuple3Arbitary<T1, T2, T3>(
+internal class Tuple3Arbitrary<T1, T2, T3>(
         arb1: Arbitrary<T1>,
         arb2: Arbitrary<T2>,
         arb3: Arbitrary<T3>
@@ -38,7 +38,7 @@ internal class Tuple3Arbitary<T1, T2, T3>(
         Tuple3Shrinker(arb1, arb2, arb3)
 )
 
-internal class Tuple4Arbitary<T1, T2, T3, T4>(
+internal class Tuple4Arbitrary<T1, T2, T3, T4>(
         arb1: Arbitrary<T1>,
         arb2: Arbitrary<T2>,
         arb3: Arbitrary<T3>,
@@ -48,7 +48,7 @@ internal class Tuple4Arbitary<T1, T2, T3, T4>(
         Tuple4Shrinker(arb1, arb2, arb3, arb4)
 )
 
-internal class Tuple5Arbitary<T1, T2, T3, T4, T5>(
+internal class Tuple5Arbitrary<T1, T2, T3, T4, T5>(
         arb1: Arbitrary<T1>,
         arb2: Arbitrary<T2>,
         arb3: Arbitrary<T3>,
@@ -59,7 +59,7 @@ internal class Tuple5Arbitary<T1, T2, T3, T4, T5>(
         Tuple5Shrinker(arb1, arb2, arb3, arb4, arb5)
 )
 
-internal class Tuple6Arbitary<T1, T2, T3, T4, T5, T6>(
+internal class Tuple6Arbitrary<T1, T2, T3, T4, T5, T6>(
         arb1: Arbitrary<T1>,
         arb2: Arbitrary<T2>,
         arb3: Arbitrary<T3>,
@@ -71,7 +71,7 @@ internal class Tuple6Arbitary<T1, T2, T3, T4, T5, T6>(
         Tuple6Shrinker(arb1, arb2, arb3, arb4, arb5, arb6)
 )
 
-internal class Tuple7Arbitary<T1, T2, T3, T4, T5, T6, T7>(
+internal class Tuple7Arbitrary<T1, T2, T3, T4, T5, T6, T7>(
         arb1: Arbitrary<T1>,
         arb2: Arbitrary<T2>,
         arb3: Arbitrary<T3>,
@@ -84,7 +84,7 @@ internal class Tuple7Arbitary<T1, T2, T3, T4, T5, T6, T7>(
         Tuple7Shrinker(arb1, arb2, arb3, arb4, arb5, arb6, arb7)
 )
 
-internal class Tuple8Arbitary<T1, T2, T3, T4, T5, T6, T7, T8>(
+internal class Tuple8Arbitrary<T1, T2, T3, T4, T5, T6, T7, T8>(
         arb1: Arbitrary<T1>,
         arb2: Arbitrary<T2>,
         arb3: Arbitrary<T3>,
@@ -98,7 +98,7 @@ internal class Tuple8Arbitary<T1, T2, T3, T4, T5, T6, T7, T8>(
         Tuple8Shrinker(arb1, arb2, arb3, arb4, arb5, arb6, arb7, arb8)
 )
 
-internal class Tuple9Arbitary<T1, T2, T3, T4, T5, T6, T7, T8, T9>(
+internal class Tuple9Arbitrary<T1, T2, T3, T4, T5, T6, T7, T8, T9>(
         arb1: Arbitrary<T1>,
         arb2: Arbitrary<T2>,
         arb3: Arbitrary<T3>,
