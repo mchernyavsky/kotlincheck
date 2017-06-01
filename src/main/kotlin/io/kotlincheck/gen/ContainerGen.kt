@@ -8,6 +8,18 @@ class MutableListGen<T>(val gen: Gen<T>, val sizeBound: Int, val fixedSize: Bool
         val size = if (fixedSize) sizeBound else Random.nextInt(0, sizeBound)
         return MutableList(size) { gen.generate() }
     }
+
+    override fun isAcceptable(value: MutableList<T>): Boolean {
+        if (value.size !in 0..sizeBound) {
+            return false
+        }
+
+        if (fixedSize && value.size != sizeBound) {
+            return false
+        }
+
+        return value.all { gen.isAcceptable(it) }
+    }
 }
 
 class MutableSetGen<T>(val gen: Gen<T>, val sizeBound: Int, val fixedSize: Boolean
@@ -19,6 +31,18 @@ class MutableSetGen<T>(val gen: Gen<T>, val sizeBound: Int, val fixedSize: Boole
             set.add(gen.generate())
         }
         return set
+    }
+
+    override fun isAcceptable(value: MutableSet<T>): Boolean {
+        if (value.size !in 0..sizeBound) {
+            return false
+        }
+
+        if (fixedSize && value.size != sizeBound) {
+            return false
+        }
+
+        return value.all { gen.isAcceptable(it) }
     }
 }
 
@@ -32,6 +56,18 @@ class MutableMapGen<K, V>(val keyGen: Gen<K>, val valueGen: Gen<V>, val sizeBoun
         }
         return map
     }
+
+    override fun isAcceptable(value: MutableMap<K, V>): Boolean {
+        if (value.size !in 0..sizeBound) {
+            return false
+        }
+
+        if (fixedSize && value.size != sizeBound) {
+            return false
+        }
+
+        return value.all { (k, v) -> keyGen.isAcceptable(k) && valueGen.isAcceptable(v) }
+    }
 }
 
 class StringGen(val lengthBound: Int, val fixedLength: Boolean
@@ -43,4 +79,6 @@ class StringGen(val lengthBound: Int, val fixedLength: Boolean
     )
 
     override fun generate(): String = charListsGen.generate().joinToString("")
+
+    override fun isAcceptable(value: String): Boolean = charListsGen.isAcceptable(value.toMutableList())
 }

@@ -1,5 +1,7 @@
 package io.kotlincheck.gen
 
-interface Gen<out T> {
+interface Gen<T> {
     fun generate(): T
+
+    fun isAcceptable(value: T): Boolean = false
 }
