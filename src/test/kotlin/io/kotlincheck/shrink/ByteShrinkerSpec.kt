@@ -5,7 +5,7 @@ import io.kotlintest.specs.ShouldSpec
 
 class ByteShrinkerSpec : ShouldSpec() {
     init {
-        "ByteShrinker.shrink"{
+        "ByteShrinker.shrink" {
             should("return 0 if origin <= 0 <= bound and 0 is counterexample") {
                 val origin = (-100).toByte()
                 val bound = 100.toByte()

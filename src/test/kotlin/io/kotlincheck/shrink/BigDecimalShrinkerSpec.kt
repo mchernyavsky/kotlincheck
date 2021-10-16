@@ -6,7 +6,7 @@ import java.math.BigDecimal
 
 class BigDecimalShrinkerSpec : ShouldSpec() {
     init {
-        "BigDecimalShrinker.shrink"{
+        "BigDecimalShrinker.shrink" {
             should("return 0 if origin <= 0 <= bound and 0 is counterexample") {
                 val origin = BigDecimal.valueOf(-100)
                 val bound = BigDecimal.valueOf(100)

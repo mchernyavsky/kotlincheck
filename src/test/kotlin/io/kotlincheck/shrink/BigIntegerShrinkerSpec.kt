@@ -6,7 +6,7 @@ import java.math.BigInteger
 
 class BigIntegerShrinkerSpec : ShouldSpec() {
     init {
-        "BigIntegerShrinker.shrink"{
+        "BigIntegerShrinker.shrink" {
             should("return 0 if origin <= 0 <= bound and 0 is counterexample") {
                 val origin = BigInteger.valueOf(-100)
                 val bound = BigInteger.valueOf(100)

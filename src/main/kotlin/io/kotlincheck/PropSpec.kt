@@ -8,21 +8,17 @@ import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class) // required to let IntelliJ discover tests
 abstract class PropSpec(body: PropSpec.() -> Unit = {}) : Spec() {
-    private var currentSuite = rootTestSuite
-    private var propositionNum = 1
+    private var currentSuite: TestSuite = rootTestSuite
+    private var propositionNum: Int = 1
 
-    val propositionFullName
-        get() = listOf(
-                javaClass.name,
-                currentSuite.name,
-                propositionNum
-        ).joinToString("/")
+    val propositionFullName: String
+        get() = listOf(javaClass.name, currentSuite.name, propositionNum).joinToString("/")
 
     init {
         body()
     }
 
-    fun property(name: String, init: () -> Unit): Unit {
+    fun property(name: String, init: () -> Unit) {
         val suite = TestSuite("Property: $name")
         currentSuite.addNestedSuite(suite)
         val temp = currentSuite

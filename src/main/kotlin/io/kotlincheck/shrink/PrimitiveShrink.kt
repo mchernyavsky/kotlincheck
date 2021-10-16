@@ -2,16 +2,14 @@ package io.kotlincheck.shrink
 
 import java.math.BigDecimal
 import java.math.BigInteger
+import kotlin.math.roundToLong
 
 class DummyShrinker<T> : Shrinker<T> {
     override fun shrink(test: (T) -> Boolean, counterexample: T): T = counterexample
 }
 
 class LongShrinker(val origin: Long, val bound: Long) : Shrinker<Long> {
-    override fun shrink(
-            test: (Long) -> Boolean,
-            counterexample: Long
-    ): Long {
+    override fun shrink(test: (Long) -> Boolean, counterexample: Long): Long {
         var low = origin
         var high = bound
         var toHigh = false
@@ -52,65 +50,40 @@ class LongShrinker(val origin: Long, val bound: Long) : Shrinker<Long> {
 }
 
 class IntShrinker(val origin: Int, val bound: Int) : Shrinker<Int> {
-    private val longShrinker = LongShrinker(origin.toLong(), bound.toLong())
+    private val longShrinker: LongShrinker = LongShrinker(origin.toLong(), bound.toLong())
 
-    override fun shrink(
-            test: (Int) -> Boolean,
-            counterexample: Int
-    ): Int = longShrinker.shrink(
-            { test(it.toInt()) },
-            counterexample.toLong()
-    ).toInt()
+    override fun shrink(test: (Int) -> Boolean, counterexample: Int): Int =
+        longShrinker.shrink({ test(it.toInt()) }, counterexample.toLong()).toInt()
 }
 
 class ShortShrinker(val origin: Short, val bound: Short) : Shrinker<Short> {
-    private val longShrinker = LongShrinker(origin.toLong(), bound.toLong())
+    private val longShrinker: LongShrinker = LongShrinker(origin.toLong(), bound.toLong())
 
-    override fun shrink(
-            test: (Short) -> Boolean,
-            counterexample: Short
-    ): Short = longShrinker.shrink(
-            { test(it.toShort()) },
-            counterexample.toLong()
-    ).toShort()
+    override fun shrink(test: (Short) -> Boolean, counterexample: Short): Short =
+        longShrinker.shrink({ test(it.toShort()) }, counterexample.toLong()).toShort()
 }
 
 class ByteShrinker(val origin: Byte, val bound: Byte) : Shrinker<Byte> {
-    private val longShrinker = LongShrinker(origin.toLong(), bound.toLong())
+    private val longShrinker: LongShrinker = LongShrinker(origin.toLong(), bound.toLong())
 
-    override fun shrink(
-            test: (Byte) -> Boolean,
-            counterexample: Byte
-    ): Byte = longShrinker.shrink(
-            { test(it.toByte()) },
-            counterexample.toLong()
-    ).toByte()
+    override fun shrink(test: (Byte) -> Boolean, counterexample: Byte): Byte =
+        longShrinker.shrink({ test(it.toByte()) }, counterexample.toLong()).toByte()
 }
 
 class CharShrinker(val origin: Char, val bound: Char) : Shrinker<Char> {
-    private val longShrinker = LongShrinker(origin.toLong(), bound.toLong())
+    private val longShrinker: LongShrinker = LongShrinker(origin.code.toLong(), bound.code.toLong())
 
-    override fun shrink(
-            test: (Char) -> Boolean,
-            counterexample: Char
-    ): Char = longShrinker.shrink(
-            { test(it.toChar()) },
-            counterexample.toLong()
-    ).toChar()
+    override fun shrink(test: (Char) -> Boolean, counterexample: Char): Char =
+        longShrinker.shrink({ test(it.toInt().toChar()) }, counterexample.code.toLong()).toInt().toChar()
 }
 
 class BooleanShrinker : Shrinker<Boolean> {
-    override fun shrink(
-            test: (Boolean) -> Boolean,
-            counterexample: Boolean
-    ): Boolean = if (!counterexample) false else test(false)
+    override fun shrink(test: (Boolean) -> Boolean, counterexample: Boolean): Boolean =
+        if (!counterexample) false else test(false)
 }
 
 class DoubleShrinker(val origin: Double, val bound: Double) : Shrinker<Double> {
-    override fun shrink(
-            test: (Double) -> Boolean,
-            counterexample: Double
-    ): Double {
+    override fun shrink(test: (Double) -> Boolean, counterexample: Double): Double {
         var low = origin
         var high = bound
         var toHigh = false
@@ -141,33 +114,20 @@ class DoubleShrinker(val origin: Double, val bound: Double) : Shrinker<Double> {
             }
         }
 
-        Math.round(high).toDouble().let {
-            if (!test(it)) {
-                return it
-            }
-        }
-
-        return high
+        val rounded = high.roundToLong().toDouble()
+        return if (test(rounded)) high else rounded
     }
 }
 
 class FloatShrinker(val origin: Float, val bound: Float) : Shrinker<Float> {
-    private val doubleShrinker = DoubleShrinker(origin.toDouble(), bound.toDouble())
+    private val doubleShrinker: DoubleShrinker = DoubleShrinker(origin.toDouble(), bound.toDouble())
 
-    override fun shrink(
-            test: (Float) -> Boolean,
-            counterexample: Float
-    ): Float = doubleShrinker.shrink(
-            { test(it.toFloat()) },
-            counterexample.toDouble()
-    ).toFloat()
+    override fun shrink(test: (Float) -> Boolean, counterexample: Float): Float =
+        doubleShrinker.shrink({ test(it.toFloat()) }, counterexample.toDouble()).toFloat()
 }
 
 class BigDecimalShrinker(val origin: BigDecimal, val bound: BigDecimal) : Shrinker<BigDecimal> {
-    override fun shrink(
-            test: (BigDecimal) -> Boolean,
-            counterexample: BigDecimal
-    ): BigDecimal {
+    override fun shrink(test: (BigDecimal) -> Boolean, counterexample: BigDecimal): BigDecimal {
         var low = origin
         var high = bound
         var toHigh = false
@@ -187,9 +147,9 @@ class BigDecimalShrinker(val origin: BigDecimal, val bound: BigDecimal) : Shrink
             high = counterexample
         }
 
-        val TWO = BigDecimal.valueOf(2)
+        val two = BigDecimal.valueOf(2)
         while (low < high) {
-            val mid = (low + high) / TWO
+            val mid = (low + high) / two
             val result = test(mid)
             if (result && toHigh || !result && !toHigh) {
                 high = mid
@@ -199,21 +159,14 @@ class BigDecimalShrinker(val origin: BigDecimal, val bound: BigDecimal) : Shrink
         }
 
         // TODO: binary search
-        generateSequence(high.setScale(0, BigDecimal.ROUND_HALF_UP)) {
+        return generateSequence(high.setScale(0, BigDecimal.ROUND_HALF_UP)) {
             high.setScale(it.scale() + 1, BigDecimal.ROUND_HALF_UP)
-        }.find {
-            !test(it)
-        }!!.let {
-            return it
-        }
+        }.first { !test(it) }
     }
 }
 
 class BigIntegerShrinker(val origin: BigInteger, val bound: BigInteger) : Shrinker<BigInteger> {
-    override fun shrink(
-            test: (BigInteger) -> Boolean,
-            counterexample: BigInteger
-    ): BigInteger {
+    override fun shrink(test: (BigInteger) -> Boolean, counterexample: BigInteger): BigInteger {
         var low = origin
         var high = bound
         var toHigh = false
@@ -233,9 +186,9 @@ class BigIntegerShrinker(val origin: BigInteger, val bound: BigInteger) : Shrink
             high = counterexample
         }
 
-        val TWO = BigInteger.valueOf(2)
+        val two = BigInteger.valueOf(2)
         while (low < high) {
-            val mid = (low + high) / TWO
+            val mid = (low + high) / two
             val result = test(mid)
             if (result && toHigh || !result && !toHigh) {
                 high = mid
@@ -249,8 +202,5 @@ class BigIntegerShrinker(val origin: BigInteger, val bound: BigInteger) : Shrink
 }
 
 class OneOfShrinker<T>(val values: List<T>) : Shrinker<T> {
-    override fun shrink(
-            test: (T) -> Boolean,
-            counterexample: T
-    ): T = values.find { !test(it) }!!
+    override fun shrink(test: (T) -> Boolean, counterexample: T): T = values.first { !test(it) }
 }

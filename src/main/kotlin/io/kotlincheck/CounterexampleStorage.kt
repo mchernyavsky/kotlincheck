@@ -9,6 +9,7 @@ import org.jetbrains.exposed.dao.IntIdTable
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
 import java.io.Serializable
+import java.sql.Blob
 import javax.sql.rowset.serial.SerialBlob
 
 
@@ -22,10 +23,10 @@ object CounterexampleStorage {
     fun <P> loadCounterexamples(propositionFullName: String): List<P> = transaction {
         try {
             Counterexample
-                    .find { Counterexamples.propositionName eq propositionFullName }
-                    .map { it.arguments }
-                    .map { it.binaryStream }
-                    .map { SerializationUtils.deserialize<P>(it) }
+                .find { Counterexamples.propositionName eq propositionFullName }
+                .map { it.arguments }
+                .map { it.binaryStream }
+                .map { SerializationUtils.deserialize<P>(it) }
         } catch (e: ClassCastException) {
             Counterexamples.deleteWhere { Counterexamples.propositionName eq propositionFullName }
             listOf()
@@ -64,13 +65,13 @@ object CounterexampleStorage {
 }
 
 object Counterexamples : IntIdTable() {
-    val propositionName = varchar("propositionName", 128).index()
-    val arguments = blob("arguments")
+    val propositionName: Column<String> = varchar("propositionName", 128).index()
+    val arguments: Column<Blob> = blob("arguments")
 }
 
 class Counterexample(id: EntityID<Int>) : IntEntity(id) {
-    companion object : IntEntityClass<Counterexample>(Counterexamples)
+    var propositionName: String by Counterexamples.propositionName
+    var arguments: Blob by Counterexamples.arguments
 
-    var propositionName by Counterexamples.propositionName
-    var arguments by Counterexamples.arguments
+    companion object : IntEntityClass<Counterexample>(Counterexamples)
 }

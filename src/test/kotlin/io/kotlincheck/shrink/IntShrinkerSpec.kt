@@ -5,7 +5,7 @@ import io.kotlintest.specs.ShouldSpec
 
 class IntShrinkerSpec : ShouldSpec() {
     init {
-        "IntShrinker.shrink"{
+        "IntShrinker.shrink" {
             should("return 0 if origin <= 0 <= bound and 0 is counterexample") {
                 val origin = -100
                 val bound = 100

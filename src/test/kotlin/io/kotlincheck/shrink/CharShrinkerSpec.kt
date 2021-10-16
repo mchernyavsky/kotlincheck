@@ -5,7 +5,7 @@ import io.kotlintest.specs.ShouldSpec
 
 class CharShrinkerSpec : ShouldSpec() {
     init {
-        "CharShrinker.shrink"{
+        "CharShrinker.shrink" {
             should("return 0 if origin = 0 <= bound and 0 is counterexample") {
                 val origin = 0.toChar()
                 val bound = 100.toChar()

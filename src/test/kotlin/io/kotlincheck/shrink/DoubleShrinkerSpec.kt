@@ -6,7 +6,7 @@ import io.kotlintest.specs.ShouldSpec
 
 class DoubleShrinkerSpec : ShouldSpec() {
     init {
-        "DoubleShrinker.shrink"{
+        "DoubleShrinker.shrink" {
             val eps = 10e-9
 
             should("return 0 if origin <= 0 <= bound and 0 is counterexample") {
